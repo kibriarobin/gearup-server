@@ -1,20 +1,39 @@
+import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
-import { IUpdateUserStatusPayload } from "./admin.interface";
+import { GetAllUsersParams, IUpdateUserStatusPayload } from "./admin.interface";
 
-const getAllUsers = async () => {
-  const users = await prisma.user.findMany({
-    omit: {
-      password: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+const getAllUsers = async ({ search, page = 1, limit = 10 }: GetAllUsersParams) => {
+  const where: Prisma.UserWhereInput = search
+    ? {
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { email: { contains: search, mode: "insensitive" } },
+        ],
+      }
+    : {};
 
-  const totalUsers = await prisma.user.count();
+  const skip = (page - 1) * limit;
+
+  const [users, totalUsers] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      omit: {
+        password: true,
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.user.count({ where }),
+  ]);
 
   return {
     data: users,
     meta: {
       total: totalUsers,
+      page,
+      limit,
+      totalPages: Math.ceil(totalUsers / limit),
     },
   };
 };
