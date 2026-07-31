@@ -5,7 +5,11 @@ import { adminService } from "./admin.service";
 import { sendResponse } from "../../utils/sendResponse";
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const result = await adminService.getAllUsers();
+  const result = await adminService.getAllUsers({
+  search: req.query.search as string,
+  page: Number(req.query.page) || 1,
+  limit: Number(req.query.limit) || 10,
+});
 
   sendResponse(res, {
     success: true,

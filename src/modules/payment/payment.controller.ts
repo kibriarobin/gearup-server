@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { paymentService } from "./payment.service";
+import config from "../../config";
 
 const createPayment = catchAsync(async (req: Request, res: Response) => {
   const customerId = req.user!.id;
@@ -27,22 +28,18 @@ const confirmPayment = catchAsync(async (req: Request, res: Response) => {
   const valId = (req.body?.val_id || req.query?.val_id) as string;
 
   if (!tranId || !valId) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      success: false,
-      message: "SSLCommerz callback data missing: tran_id or val_id",
-      data: {
-        body: req.body,
-        query: req.query,
-      },
-    });
-  }
+  return res.redirect(`${config.FRONTEND_URL}/payment/cancel`);
+}
 
-  await paymentService.confirmPayment(tranId, valId);
+try {
+  const result = await paymentService.confirmPayment(tranId, valId);
 
-  return res.status(httpStatus.OK).json({
-    success: true,
-    message: "Payment completed successfully",
-  });
+  return res.redirect(
+    `${config.FRONTEND_URL}/payment/success?orderId=${result.rentalOrderId}`,
+  );
+} catch (error) {
+  return res.redirect(`${config.FRONTEND_URL}/payment/cancel`);
+}
 });
 
 const getMyPayments = catchAsync(async (req: Request, res: Response) => {

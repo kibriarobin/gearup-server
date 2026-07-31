@@ -2,7 +2,7 @@ import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { GetAllUsersParams, IUpdateUserStatusPayload } from "./admin.interface";
 
-const getAllUsers = async ({ search, page = 1, limit = 10 }: GetAllUsersParams) => {
+const getAllUsers = async ({ search, page = 1, limit = 4 }: GetAllUsersParams) => {
   const where: Prisma.UserWhereInput = search
     ? {
         OR: [

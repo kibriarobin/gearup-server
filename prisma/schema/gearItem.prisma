@@ -5,6 +5,7 @@ model GearItem {
     pricePerDay Int
     brand       String?
     model       String?
+    images String[] @default([])
 
     totalStock     Int @default(1)
     availableCount Int @default(1)

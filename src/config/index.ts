@@ -7,6 +7,7 @@ export default {
   PORT: process.env.PORT!,
   DATABASE_URL: process.env.DATABASE_URL!,
   APP_URL: process.env.APP_URL!,
+  FRONTEND_URL: process.env.FRONTEND_URL!,
   BCRYPT_SALT_ROUNDS: process.env.BCRYPT_SALT_ROUNDS!,
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET!,
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,

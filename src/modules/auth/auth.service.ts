@@ -4,6 +4,7 @@ import { ILoginUserPayload, IRegisterUserPayload } from "./auth.interface";
 import config from "../../config";
 import { jwtUtils } from "../../utils/jwt";
 import { validateLogin, validateRegister } from "../../utils/validate";
+import { JwtPayload } from "jsonwebtoken";
 
 const registerUser = async (payload: IRegisterUserPayload) => {
   const validationError = validateRegister(payload);
@@ -120,8 +121,45 @@ const getMyProfile = async (userId: string) => {
   return user;
 };
 
+const refreshToken = async (refreshToken: string) => {
+  const verifiedRefreshToken = jwtUtils.verifyToken(
+    refreshToken,
+    config.JWT_REFRESH_SECRET,
+  );
+
+  if (!verifiedRefreshToken.success) {
+    throw new Error(verifiedRefreshToken.error);
+  }
+
+  const { id } = verifiedRefreshToken.data as JwtPayload;
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id },
+  });
+
+  if (user.status === "SUSPENDED") {
+    throw new Error("Your account has been suspended");
+  }
+
+  const jwtPayload = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.JWT_ACCESS_SECRET,
+    config.JWT_ACCESS_EXPIRATION,
+  );
+
+  return { accessToken };
+};
+
 export const authService = {
   registerUser,
   loginUser,
   getMyProfile,
+  refreshToken,
 };
