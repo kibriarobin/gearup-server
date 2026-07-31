@@ -5,7 +5,7 @@ A backend REST API for a sports and outdoor equipment rental service. Customers 
 
 **Live API:** https://gearup-server-mocha.vercel.app
 
-**API Docs (Postman):** https://github.com/kibriarobin97/gearup-server/blob/main/gearup-server.postman_collection.json
+**API Docs (Postman):** https://github.com/kibriarobin/gearup-server/blob/main/gearup-server.postman_collection.json
 
 ---
 
